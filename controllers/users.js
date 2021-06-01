@@ -3,25 +3,21 @@ const User = require('../models/user');
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => {
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
+    .catch(() => {
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.user._id)
+  User.findById(req.params.userId)
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
-      if (err.name === 'Not Found') {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь не найден' });
       }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -31,47 +27,45 @@ module.exports.createUser = (req, res) => {
       res.status(201).send(user);
     })
     .catch((err) => {
-      if (err.name === 'Bad Request') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Введены некоректные данные' });
       }
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
 module.exports.updateProfile = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, { ...req.body })
+  const owner = req.user._id;
+  const { name, about } = req.body;
+  User.findByIdAndUpdate(owner, { name, about })
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'Bad Request') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Введены некоректные данные' });
       }
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
-      if (err.name === 'Not Found') {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь не найден' });
       }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
 module.exports.updateAvatar = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, { ...req.body })
+  const owner = req.user._id;
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(owner, { avatar })
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'Bad Request') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Введены некоректные данные' });
       }
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
-      if (err.name === 'Not Found') {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: 'Пользователь не найден' });
       }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };

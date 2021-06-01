@@ -3,40 +3,35 @@ const Card = require('../models/card');
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => {
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
+    .catch(() => {
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
 module.exports.createCard = (req, res) => {
-  Card.create({ ...req.body })
+  const { name, link } = req.body;
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'Bad Request') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Введены некоректные данные' });
       }
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.user._id)
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
-      if (err.name === 'Not Found') {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: 'Карточка не найдена' });
       }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -50,12 +45,10 @@ module.exports.likeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
-      if (err.name === 'Not Found') {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: 'Карточка не найдена' });
       }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -69,11 +62,9 @@ module.exports.dislikeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'Internal Server Error') {
-        res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-      }
-      if (err.name === 'Not Found') {
+      if (err.name === 'CastError') {
         res.status(404).send({ message: 'Карточка не найдена' });
       }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };

@@ -17,16 +17,15 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 
-app.use(usersRouter);
-app.use(cardsRouter);
-
 app.use((req, res, next) => {
   req.user = {
     _id: '60b5045c0264390f8c9103dc',
   };
-
   next();
 });
+
+app.use('/', cardsRouter);
+app.use('/', usersRouter);
 
 app.listen(PORT, () => {
 
