@@ -13,14 +13,14 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUser = (req, res) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-      }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'Internal Server Error') {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      }
+      if (err.name === 'Not Found') {
+        res.status(404).send({ message: 'Пользователь не найден' });
       }
     });
 };
@@ -43,9 +43,6 @@ module.exports.createUser = (req, res) => {
 module.exports.updateProfile = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { ...req.body })
     .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-      }
       res.send(user);
     })
     .catch((err) => {
@@ -54,6 +51,9 @@ module.exports.updateProfile = (req, res) => {
       }
       if (err.name === 'Internal Server Error') {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      }
+      if (err.name === 'Not Found') {
+        res.status(404).send({ message: 'Пользователь не найден' });
       }
     });
 };
@@ -61,9 +61,6 @@ module.exports.updateProfile = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { ...req.body })
     .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-      }
       res.send(user);
     })
     .catch((err) => {
@@ -72,6 +69,9 @@ module.exports.updateAvatar = (req, res) => {
       }
       if (err.name === 'Internal Server Error') {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      }
+      if (err.name === 'Not Found') {
+        res.status(404).send({ message: 'Пользователь не найден' });
       }
     });
 };

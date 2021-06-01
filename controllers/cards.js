@@ -28,14 +28,14 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.user._id)
     .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Карточка не найдена' });
-      }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'Internal Server Error') {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      }
+      if (err.name === 'Not Found') {
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
     });
 };
@@ -47,14 +47,14 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Карточка не найдена' });
-      }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'Internal Server Error') {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      }
+      if (err.name === 'Not Found') {
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
     });
 };
@@ -66,14 +66,14 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Карточка не найдена' });
-      }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'Internal Server Error') {
         res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      }
+      if (err.name === 'Not Found') {
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
     });
 };
