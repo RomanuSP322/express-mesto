@@ -37,7 +37,14 @@ module.exports.createUser = (req, res) => {
 module.exports.updateProfile = (req, res) => {
   const owner = req.user._id;
   const { name, about } = req.body;
-  User.findByIdAndUpdate(owner, { name, about })
+  User.findByIdAndUpdate(
+    owner,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       res.send(user);
     })
@@ -55,7 +62,14 @@ module.exports.updateProfile = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const owner = req.user._id;
   const { avatar } = req.body;
-  User.findByIdAndUpdate(owner, { avatar })
+  User.findByIdAndUpdate(
+    owner,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       res.send(user);
     })
