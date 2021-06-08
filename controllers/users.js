@@ -30,7 +30,9 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       email: req.body.email,
       password: hash,
-      ...req.body,
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar,
     }))
     .then((user) => {
       res.status(201).send({
@@ -52,9 +54,8 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.login = (req, res, next) => {
-  const { email } = req.body;
-
-  return User.findUserByCredentials(email).select('+password')
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       res.cookie(
         'jwt',
@@ -68,7 +69,8 @@ module.exports.login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         },
-      );
+      )
+        .send(user);
     })
     .catch(next);
 };
