@@ -3,23 +3,16 @@ const UnauthorizedError = require('../errors/unauthorized');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-const extractBearerToken = (header) => header.replace('Bearer ', '');
-
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
-  const { authorization } = req.cookies.jwt;
-
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new UnauthorizedError('Войдите на сайт');
-  }
-
-  const token = extractBearerToken(authorization);
+  const { token } = req.cookies.jwt;
+  if (!token) throw new UnauthorizedError('Войдите на сайт');
   let payload;
 
   try {
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
-    return Promise.reject(new UnauthorizedError('Войдите на сайт'));
+    throw new UnauthorizedError('Войдите на сайт');
   }
 
   req.user = payload;
