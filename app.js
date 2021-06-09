@@ -3,7 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { errors } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
+const NotFoundError = require('./errors/not-found');
 
 const usersRouter = require('./routes/users.js');
 const cardsRouter = require('./routes/cards.js');
@@ -23,13 +24,27 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(/^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$/),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).required(),
+  }),
+}), createUser);
 
 app.use(auth);
 
 app.use('/', cardsRouter);
 app.use('/', usersRouter);
+app.use('*', () => { throw new NotFoundError('Страница не найдена'); });
 
 app.use(errors());
 
