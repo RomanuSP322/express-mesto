@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const NotFoundError = require('./errors/not-found');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const usersRouter = require('./routes/users.js');
 const cardsRouter = require('./routes/cards.js');
@@ -40,11 +41,13 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
+app.use(requestLogger);
 app.use(auth);
 
 app.use('/', cardsRouter);
 app.use('/', usersRouter);
 app.use('*', () => { throw new NotFoundError('Страница не найдена'); });
+app.use(errorLogger);
 
 app.use(errors());
 
