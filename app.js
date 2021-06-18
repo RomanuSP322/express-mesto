@@ -26,7 +26,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(cookieParser());
-
+app.use(requestLogger);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
@@ -43,14 +43,12 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use(requestLogger);
 app.use(auth);
 
 app.use('/', cardsRouter);
 app.use('/', usersRouter);
-app.use('*', () => { throw new NotFoundError('Страница не найдена'); });
 app.use(errorLogger);
-
+app.use('*', () => { throw new NotFoundError('Страница не найдена'); });
 app.use(errors());
 
 // eslint-disable-next-line no-unused-vars
