@@ -4,11 +4,13 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getUsers,
   getUser,
+  getMe,
   updateProfile,
   updateAvatar,
 } = require('../controllers/users');
 
 router.get('/users', getUsers);
+router.get('/users/me', getMe);
 router.get('/users/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().alphanum().length(24),

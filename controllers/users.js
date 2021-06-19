@@ -24,6 +24,18 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getMe = (req, res, next) => {
+  const owner = req.user._id;
+  User.findById(owner)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Такого пользователя не существует');
+      }
+      res.send(user);
+    })
+    .catch(next);
+};
+
 module.exports.createUser = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10)
@@ -57,20 +69,17 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      res.cookie(
-        'jwt',
-        {
-          token: jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', {
-            expiresIn: '7d',
-          }),
-        },
-        {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          samesire: true,
-        },
-      )
-        .send(user);
+      const token = {
+        token: jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', {
+          expiresIn: '7d',
+        }),
+      };
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+        samesire: true,
+      })
+        .send(token);
     })
     .catch(next);
 };
