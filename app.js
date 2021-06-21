@@ -10,6 +10,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const usersRouter = require('./routes/users.js');
 const cardsRouter = require('./routes/cards.js');
+const crashTest = require('./routes/crash-test.js');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
@@ -28,11 +29,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(requestLogger);
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
+app.use('/', crashTest);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
