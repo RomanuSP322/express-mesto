@@ -1,9 +1,8 @@
 const router = require('express').Router();
-const BadRequestError = require('../errors/bad-request');
 
 router.get('/crash-test', () => {
   setTimeout(() => {
-    throw new BadRequestError('Сервер сейчас упадёт');
+    throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
 
