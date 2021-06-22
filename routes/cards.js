@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const isUrl = require('validator/lib/isURL');
 
 const {
   getCards,
@@ -13,7 +14,12 @@ router.get('/cards', getCards);
 router.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(/^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$/),
+    link: Joi.string().required().custom((value, helpers) => {
+      if (isUrl(value, { require_protocol: true })) {
+        return value;
+      }
+      return helpers.message('Неверная ссылка');
+    }),
   }),
 }), createCard);
 router.delete('/cards/:cardId', celebrate({

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const isUrl = require('validator/lib/isURL');
 
 const {
   getUsers,
@@ -24,7 +25,15 @@ router.patch('/users/me', celebrate({
 }), updateProfile);
 router.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(/^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$/),
+    avatar: Joi.string().required().custom((value, helpers) => {
+      if (isUrl(value, { require_protocol: true })) {
+        return value;
+      }
+      return helpers.message('Неверная ссылка');
+    })
+      .messages({
+        'any.required': 'Поле должно быть заполнено',
+      }),
   }),
 }), updateAvatar);
 
